@@ -1,0 +1,165 @@
+version: "3.9"
+services:
+    redis:
+        image: redis
+        container_name: redis-dev
+        environment:
+            - TZ=Asia/Shanghai
+        restart: always
+        ports:
+            - "6379:6379"
+        volumes:
+            - ${DOCKERSPACE}/redis:/data
+        networks:
+            - lucky_network
+    # Mysql
+    mysql:
+        image: mysql:8
+        container_name: mysql8
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_DATABASE: lucky-project
+            MYSQL_USER: lucky
+            MYSQL_PASSWORD: lucky123456!
+            MYSQL_ROOT_PASSWORD: lucky123456!!
+        volumes:
+            - ${DOCKERSPACE}/mysql/data:/var/lib/mysql
+        ports:
+            - "3307:3306"
+        networks:
+            - lucky_network
+    php-56:
+        build:
+            context: .
+            dockerfile: dockerfile/php56.php
+        container_name: php-56
+        restart: unless-stopped
+        environment:
+            DB_HOST: mysql8
+            DB_PORT: 3306
+            DATABASE_HOSTNAME: mysql8
+        ports:
+            - "9002:9000"
+        volumes:
+            - ${WORKSPACE}:/var/www/html
+            - ${DOCKERSPACE}/logs/php/php56:/var/log/php-fpm
+            - ${DOCKERSPACE}/php/php56/sessions:/var/lib/php/sessions
+            - ${DOCKERSPACE}/php/php56/www.conf:/usr/local/etc/php-fpm.d/www.conf
+            - ${DOCKERSPACE}/php/php56/php.ini:/usr/local/etc/php/php.ini
+            - ${DOCKERSPACE}/php/php56/lib:/var/lib/php/lib
+        user: 1000:1000
+        extra_hosts:
+            - "api.stat.local:172.17.0.1"
+        depends_on:
+            - mysql
+        networks:
+            - lucky_network
+    php-74:
+        build:
+            context: .
+            dockerfile: dockerfile/php74.php
+        container_name: php-74
+        restart: unless-stopped
+        environment:
+            DB_HOST: mysql8
+            DB_PORT: 3306
+            DATABASE_HOSTNAME: mysql8
+        ports:
+            - "9003:9000"
+        volumes:
+            - ${WORKSPACE}:/var/www/html
+            - ${DOCKERSPACE}/logs/php/php74:/var/log/php-fpm
+            - ${DOCKERSPACE}/php/php74/sessions:/var/lib/php/sessions
+            - ${DOCKERSPACE}/php/php74/www.conf:/usr/local/etc/php-fpm.d/www.conf
+            - ${DOCKERSPACE}/php/php74/php.ini:/usr/local/etc/php/php.ini
+            - ${DOCKERSPACE}/php/php74/lib:/var/lib/php/lib
+        depends_on:
+            - mysql
+        networks:
+            - lucky_network
+    # PHP-8.1
+    php-81:
+        build:
+            context: .
+            dockerfile: dockerfile/php81.php
+        container_name: php-81
+        restart: unless-stopped
+        environment:
+            DB_HOST: mysql8
+            DB_PORT: 3306
+            DATABASE_HOSTNAME: mysql8
+        ports:
+            - "9000:9000"
+        volumes:
+            - ${WORKSPACE}:/var/www/html
+            - ${DOCKERSPACE}/logs/php/php81:/var/log/php-fpm
+            - ${DOCKERSPACE}/php/php81/sessions:/var/lib/php/sessions
+            - ${DOCKERSPACE}/php/php81/www.conf:/usr/local/etc/php-fpm.d/www.conf
+            - ${DOCKERSPACE}/php/php81/php.ini:/usr/local/etc/php/php.ini
+        depends_on:
+            - mysql
+        networks:
+            - lucky_network
+    # PHP-8.2
+    php-82:
+        build:
+            context: .
+            dockerfile: dockerfile/php82.php
+        container_name: php-82
+        restart: unless-stopped
+        environment:
+            DB_HOST: mysql8
+            DB_PORT: 3306
+            DATABASE_HOSTNAME: mysql8
+        ports:
+            - "9008:9000"
+        volumes:
+            - ${WORKSPACE}:/var/www/html
+            - ${DOCKERSPACE}/logs/php/php82:/var/log/php-fpm
+            - ${DOCKERSPACE}/php/php82/sessions:/var/lib/php/sessions
+            - ${DOCKERSPACE}/php/php82/www.conf:/usr/local/etc/php-fpm.d/www.conf
+            - ${DOCKERSPACE}/php/php82/php.ini:/usr/local/etc/php/php.ini
+        depends_on:
+            - mysql
+        networks:
+            - lucky_network
+    # PHP-8.0
+    php-80:
+        build:
+            context: .
+            dockerfile: dockerfile/php80.php
+        container_name: php-80
+        restart: unless-stopped
+        environment:
+            DB_HOST: mysql8
+            DB_PORT: 3306
+        ports:
+            - "9001:9000"
+        volumes:
+            - ${WORKSPACE}:/var/www/html
+            - ${DOCKERSPACE}/logs/php/php80:/var/log/php-fpm
+            - ${DOCKERSPACE}/php/php80/sessions:/var/lib/php/sessions
+            - ${DOCKERSPACE}/php/php80/www.conf:/usr/local/etc/php-fpm.d/www.conf
+            # - ${DOCKERSPACE}/php/php80/php.ini:/usr/local/etc/php/php.ini
+        depends_on:
+            - mysql
+        networks:
+            - lucky_network
+    # Nginx
+    nginx:
+        image: nginx:alpine
+        container_name: lucky-project-nginx
+        restart: unless-stopped
+        ports:
+            - "8080:80"
+            - "453:443"
+        volumes:
+            - ${WORKSPACE}:/var/www/html
+            - ${WORKSPACE}/projects/admin_laravel_layui/storage/app/upload:/var/www/html/projects/admin_laravel_layui/public/upload
+            - ${DOCKERSPACE}/nginx/conf.d:/etc/nginx/conf.d
+            - ${DOCKERSPACE}/logs/nginx:/var/log/nginx
+        networks:
+            - lucky_network
+networks:
+    lucky_network:
