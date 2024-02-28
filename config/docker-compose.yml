@@ -11,7 +11,8 @@ services:
         volumes:
             - ${DOCKERSPACE}/redis:/data
         networks:
-            - lucky_network
+            lucky_network:
+                  ipv4_address: 172.19.0.2
     # Mysql
     mysql:
         image: mysql:8
@@ -28,7 +29,8 @@ services:
         ports:
             - "3307:3306"
         networks:
-            - lucky_network
+            lucky_network:
+                ipv4_address: 172.19.0.3
     php-56:
         build:
             context: .
@@ -50,7 +52,7 @@ services:
             - ${DOCKERSPACE}/php/php56/lib:/var/lib/php/lib
         user: 1000:1000
         extra_hosts:
-            - "api.stat.local:172.17.0.1"
+            - "api.stat.local:172.19.0.1"
         depends_on:
             - mysql
         networks:
@@ -163,3 +165,8 @@ services:
             - lucky_network
 networks:
     lucky_network:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.19.0.0/24

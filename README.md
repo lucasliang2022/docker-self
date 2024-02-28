@@ -46,3 +46,7 @@
 
 # 获取镜像IP地址
     sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 75000c343eb7
+
+# 更换IP
+    清理无用网路 并 重启网路
+    
