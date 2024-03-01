@@ -158,11 +158,11 @@ services:
             - "453:443"
         volumes:
             - ${WORKSPACE}:/var/www/html
-            - ${WORKSPACE}/projects/admin_laravel_layui/storage/app/upload:/var/www/html/projects/admin_laravel_layui/public/upload
             - ${DOCKERSPACE}/nginx/conf.d:/etc/nginx/conf.d
             - ${DOCKERSPACE}/logs/nginx:/var/log/nginx
         networks:
-            - lucky_network
+            lucky_network:
+                ipv4_address: 172.19.0.5
 networks:
     lucky_network:
         driver: bridge
