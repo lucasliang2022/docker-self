@@ -50,4 +50,6 @@
 # 更换IP
     清理无用网路 并 重启网路
 
+    sudo systemctl restart docker 
+
     

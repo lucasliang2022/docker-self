@@ -151,7 +151,7 @@ services:
     # Nginx
     nginx:
         image: nginx:alpine
-        container_name: lucky-project-nginx
+        container_name: nginx
         restart: unless-stopped
         ports:
             - "8080:80"
@@ -161,12 +161,11 @@ services:
             - ${DOCKERSPACE}/nginx/conf.d:/etc/nginx/conf.d
             - ${DOCKERSPACE}/logs/nginx:/var/log/nginx
         networks:
-            lucky_network:
-                ipv4_address: 172.19.0.5
+            - lucky_network
 networks:
     lucky_network:
         driver: bridge
         ipam:
-            driver: default
             config:
                 - subnet: 172.19.0.0/24
+                  gateway: 172.19.0.1

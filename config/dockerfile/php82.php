@@ -9,6 +9,7 @@ RUN docker-php-ext-install gd
 
 RUN docker-php-ext-install pdo_mysql \
 && docker-php-ext-install zip \
+&& docker-php-ext-install curl \
 && docker-php-ext-install mbstring \
 && docker-php-ext-install pcntl
 
